@@ -34,25 +34,27 @@ using namespace std;
 #define MAX_FRAME 1000
 #define MIN_NUM_FEAT 2000
 
+#define RENDERING_OFFSET_X 500
+#define RENDERING_OFFSET_Y 500
+
+ Mat traj = Mat::zeros(1000, 1000, CV_8UC3);
+
 // IMP: Change the file directories (4 places) according to where your dataset is saved before running!
+std::string dataset_name = "08";
 
- Mat traj = Mat::zeros(600, 600, CV_8UC3);
-
-
+std::string dataset_path = "/Users/peterbeno/Desktop/KITTI/";
 
 double getAbsoluteScale(int frame_id, int sequence_id, double z_cal)	{
   
   string line;
   int i = 0;
-  ifstream myfile ("/home/peter/Desktop/KITTI_V0/poses/00.txt");
+  ifstream myfile (dataset_path + "poses/" + dataset_name + ".txt");
   double x =0, y=0, z = 0;
   double x_prev, y_prev, z_prev;
   if (myfile.is_open())
   {
     while (( getline (myfile,line) ) && (i<=frame_id))
     {
-      circle(traj, Point(x, y) ,1, CV_RGB(0,255,0), 2);
-
       z_prev = z;
       x_prev = x;
       y_prev = y;
@@ -64,6 +66,11 @@ double getAbsoluteScale(int frame_id, int sequence_id, double z_cal)	{
         if (j==3)  x=z;
       }
       
+      // draw reference trajectory
+      circle(traj, Point(x + RENDERING_OFFSET_X, y + RENDERING_OFFSET_Y) ,1, CV_RGB(0,255,0), 2);
+
+      std::cout << "X: " << x + 300 << " Y: " << y + 100 << " Z: " << z << std::endl;
+
       i++;
     }
     myfile.close();
@@ -90,8 +97,8 @@ int main( int argc, char** argv )	{
   double scale = 1.00;
   char filename1[200];
   char filename2[200];
-  sprintf(filename1, "/home/peter/Desktop/KITTI_V0/00/image_0/%06d.png", 0);
-  sprintf(filename2, "/home/peter/Desktop/KITTI_V0/00/image_0/%06d.png", 1);
+  sprintf(filename1, "%s%s/image_0/%06d.png", dataset_path.c_str(), dataset_name.c_str(), 0);
+  sprintf(filename2, "%s%s/image_0/%06d.png", dataset_path.c_str(), dataset_name.c_str(), 1);
 
   std::cout << filename1 << endl << filename2 << endl;
 
@@ -146,7 +153,7 @@ int main( int argc, char** argv )	{
 
  
   for(int numFrame=2; numFrame < MAX_FRAME; numFrame++)	{
-  	sprintf(filename, "/home/peter/Desktop/KITTI_V0/00/image_0/%06d.png", numFrame);
+  	sprintf(filename, "%s%s/image_0/%06d.png", dataset_path.c_str(), dataset_name.c_str(), numFrame);
     //cout << numFrame << endl;
   	Mat currImage_c = imread(filename);
   	cvtColor(currImage_c, currImage, COLOR_BGR2GRAY);
@@ -197,8 +204,8 @@ int main( int argc, char** argv )	{
     prevImage = currImage.clone();
     prevFeatures = currFeatures;
 
-    int x = int(t_f.at<double>(0)) + 300;
-    int y = int(t_f.at<double>(2)) + 100;
+    int x = int(t_f.at<double>(0)) + RENDERING_OFFSET_X;
+    int y = -1 * int(t_f.at<double>(2)) + RENDERING_OFFSET_Y;
     circle(traj, Point(x, y) ,1, CV_RGB(255,0,0), 2);
 
     rectangle( traj, Point(10, 30), Point(550, 50), CV_RGB(0,0,0), CV_FILLED);

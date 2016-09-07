@@ -84,10 +84,10 @@ void featureDetection(Mat img_1, vector<Point2f>& points1)	{   //uses FAST as of
 
 
 void featureDetection(Mat img_1, vector<Point2f>& points1, vector<KeyPoint>& keypoints_1)  {   //uses FAST as of now, modify parameters as necessary
-  Ptr<ORB> detector = ORB::create();
-  detector->detect( img_1, keypoints_1);
-// int fast_threshold = 20;
-// bool nonmaxSuppression = true;
-// FAST(img_1, keypoints_1, fast_threshold, nonmaxSuppression);
+  //Ptr<ORB> detector = ORB::create();
+  //detector->detect( img_1, keypoints_1);
+  int fast_threshold = 20;
+  bool nonmaxSuppression = true;
+  FAST(img_1, keypoints_1, fast_threshold, nonmaxSuppression);
   KeyPoint::convert(keypoints_1, points1, vector<int>());
 }
